@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table with jQuery</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+        }
+        th {
+            background: #f9f9f9;
+        }
+        button {
+            padding: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .add-btn {
+            background: #4CAF50;
+            color: #fff;
+        }
+        .remove-btn {
+            background: #f44336;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Dynamic Table with Add/Remove Rows</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Particular</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="table-body">
+        <tr>
+            <td>1</td>
+            <td>Item 1</td>
+            <td><input type="number" class="qty" value="10" min="0"></td>
+            <td><input type="number" class="rate" value="100" min="0"></td>
+            <td class="amount">1000</td>
+            <td>
+                <button class="add-btn">+</button>
+                <button class="remove-btn">x</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        // Function to recalculate row numbers
+        function updateRowNumbers() {
+            $('#table-body tr').each(function (index) {
+                $(this).find('td:first').text(index + 1);
+            });
+        }
+
+        // Function to update the amount when qty or rate changes
+        function updateAmount(row) {
+            const qty = parseFloat($(row).find('.qty').val()) || 0;
+            const rate = parseFloat($(row).find('.rate').val()) || 0;
+            const amount = qty * rate;
+            $(row).find('.amount').text(amount.toFixed(2));
+        }
+
+        // Add a new row
+        $('#table-body').on('click', '.add-btn', function () {
+            const newRow = `
+                <tr>
+                    <td></td>
+                    <td><input type="text" class="particular" placeholder="Enter item"></td>
+                    <td><input type="number" class="qty" value="0" min="0"></td>
+                    <td><input type="number" class="rate" value="0" min="0"></td>
+                    <td class="amount">0.00</td>
+                    <td>
+                        <button class="add-btn">+</button>
+                        <button class="remove-btn">x</button>
+                    </td>
+                </tr>`;
+            $('#table-body').append(newRow);
+            updateRowNumbers();
+        });
+
+        // Remove a row
+        $('#table-body').on('click', '.remove-btn', function () {
+            $(this).closest('tr').remove();
+            updateRowNumbers();
+        });
+
+        // Update amount when qty or rate changes
+        $('#table-body').on('input', '.qty, .rate', function () {
+            const row = $(this).closest('tr');
+            updateAmount(row);
+        });
+
+        // Initialize the amounts for existing rows
+        $('#table-body tr').each(function () {
+            updateAmount(this);
+        });
+    });
+</script>
+
+</body>
+</html>
